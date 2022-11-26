@@ -1,13 +1,16 @@
 name = "cloudflare-chat"
-main = "dist/index.mjs"
+main = "./dist/index.mjs"
 compatibility_date = "2022-11-23"
 
 [durable_objects]
-bindings = [{ name = "MY_DURABLE_OBJECT", class_name = "DurableObjectExample" }]
+bindings = [
+  { name = "CHANNELS", class_name = "ChannelsDO" },
+  { name = "CHANNEL", class_name = "ChannelDO" }
+]
 
 [[migrations]]
 tag = "v1"
-new_classes = ["DurableObjectExample"] 
+new_classes = ["ChannelsDO"]
 
 [build]
 command = "npm run build"

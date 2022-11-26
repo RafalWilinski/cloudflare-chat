@@ -13,5 +13,8 @@
     "start": "wrangler dev",
     "deploy": "wrangler publish",
     "build": "npx esbuild --bundle --format=esm --target=esnext ./src/index.ts --outdir=dist --out-extension:.js=.mjs --external:__STATIC_CONTENT_MANIFEST --conditions=worker,browser"
+  },
+  "dependencies": {
+    "graphql": "^16.6.0"
   }
 }
