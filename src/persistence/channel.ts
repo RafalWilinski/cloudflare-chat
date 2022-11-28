@@ -1,3 +1,11 @@
+export interface Channel {
+  id: string;
+  name: string;
+  createdAt: string;
+  messages: any[];
+  archivedAt?: string;
+}
+
 export class ChannelDO implements DurableObject {
   private state: DurableObjectState;
 
@@ -5,35 +13,62 @@ export class ChannelDO implements DurableObject {
     this.state = state;
   }
 
+  static actions = [
+    {
+      path: "/create",
+      action: this.prototype.createChannel,
+    },
+  ];
+
   async fetch(request: Request) {
     const url = new URL(request.url);
 
-    console.log("ChannelDO fetch " + url.pathname);
     if (url.pathname === "/create") {
-      console.log("Creating channel with ID: " + this.state.id.toString());
-
-      const name = url.searchParams.get("name");
-      await this.state.storage.put("id", this.state.id.toString());
-      await this.state.storage.put("name", name);
-      await this.state.storage.put("messages", []);
-      await this.state.storage.put("createdAt", new Date().toISOString());
+      await this.createChannel(url.searchParams.get("name"));
+    } else if (url.pathname === "/archive") {
+      await this.archiveChannel(url.searchParams.get("id"));
     }
 
+    const channel = await this.getChannel();
+
+    return new Response(JSON.stringify(channel));
+  }
+
+  public async createChannel(name: string | null) {
+    if (!name) {
+      throw new Error('"name" parameter missing');
+    }
+
+    console.log("Creating channel with ID: " + this.state.id.toString());
+
+    await this.state.storage.put("id", this.state.id.toString());
+    await this.state.storage.put("name", name);
+    await this.state.storage.put("messages", []);
+    await this.state.storage.put("createdAt", new Date().toISOString());
+  }
+
+  private async archiveChannel(id: string | null) {
+    if (!id) {
+      throw new Error('"name" parameter missing');
+    }
+
+    await this.state.storage.put("archivedAt", new Date().toISOString());
+  }
+
+  private async getChannel(): Promise<Channel> {
     const id = await this.state.storage.get("id");
     const name = await this.state.storage.get("name");
     const messages = await this.state.storage.get("messages");
     const createdAt = await this.state.storage.get("createdAt");
-    const deletedAt = await this.state.storage.get("deletedAt");
+    const archivedAt = await this.state.storage.get("archivedAt");
 
-    return new Response(
-      JSON.stringify({
-        id,
-        name,
-        messages,
-        createdAt,
-        deletedAt,
-      })
-    );
+    return {
+      id,
+      name,
+      messages,
+      createdAt,
+      archivedAt,
+    } as Channel;
   }
 }
 

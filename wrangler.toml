@@ -1,6 +1,8 @@
 name = "cloudflare-chat"
 main = "./dist/index.mjs"
 compatibility_date = "2022-11-23"
+compatibility_flags = ["streams_enable_constructors"]
+
 
 [durable_objects]
 bindings = [
@@ -10,7 +12,7 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["ChannelsDO"]
+new_classes = ["ChannelsDO", "ChannelDO"]
 
 [build]
 command = "npm run build"

@@ -1,13 +1,12 @@
-import { GraphQLTypeResolver } from "graphql";
 import { Context } from "..";
 
-export const channel: GraphQLTypeResolver<{ id: string }, Context> = async (
-  value,
-  context,
-  _info
+export const channel = async (
+  _: unknown,
+  value: { id: string },
+  context: Context
 ) => {
-  const channelId = context.env.CHANNEL.idFromName(value.id);
-  const channelStub = context.env.CHANNEL.get(channelId);
+  const channelId = context.CHANNEL.idFromName(value.id);
+  const channelStub = context.CHANNEL.get(channelId);
 
   const response = await channelStub.fetch(context.request.url);
 
